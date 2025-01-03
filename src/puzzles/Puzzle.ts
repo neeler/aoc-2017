@@ -69,7 +69,7 @@ AoC ${year} Day ${this.config.day}
             const exampleData = example
                 ? this.getExampleData({ part: 1 })
                 : undefined;
-            if (exampleData) {
+            if (exampleData !== undefined) {
                 const result = await (
                     this.config.example1 ?? this.config.part1
                 )(exampleData, {
@@ -89,7 +89,7 @@ AoC ${year} Day ${this.config.day}
             const puzzleData = mainProblem
                 ? this.getPuzzleData({ part: 1 })
                 : undefined;
-            if (puzzleData) {
+            if (puzzleData !== undefined) {
                 const result = await this.config.part1(puzzleData, {
                     puzzle: true,
                     part: 1,
@@ -109,7 +109,7 @@ AoC ${year} Day ${this.config.day}
             const exampleData = example
                 ? this.getExampleData({ part: 2 })
                 : undefined;
-            if (exampleData) {
+            if (exampleData !== undefined) {
                 const result = await (
                     this.config.example2 ?? this.config.part2
                 )(exampleData, {
@@ -129,7 +129,7 @@ AoC ${year} Day ${this.config.day}
             const puzzleData = mainProblem
                 ? this.getPuzzleData({ part: 2 })
                 : undefined;
-            if (puzzleData) {
+            if (puzzleData !== undefined) {
                 const result = await this.config.part2(puzzleData, {
                     puzzle: true,
                     part: 2,
