@@ -7,7 +7,7 @@ async function start() {
 
     await puzzle1.run({
         example: true,
-        mainProblem: false,
+        mainProblem: true,
     });
 
     console.log(kleur.cyan(`All puzzles ran in ${timer.time}.`));
