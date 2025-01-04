@@ -184,7 +184,7 @@ export class GraphNode {
         this.distancesTo.set(node, distance);
     }
 
-    neighbors() {
+    get neighbors() {
         return Array.from(this.distancesTo.keys());
     }
 
