@@ -12,6 +12,13 @@ export function itemToIndexMap<T>(array: T[]) {
     }, new Map<T, number>());
 }
 
+export function arrayToCountMap<T>(array: T[]): Map<T, number> {
+    return array.reduce((map, value) => {
+        map.set(value, (map.get(value) ?? 0) + 1);
+        return map;
+    }, new Map<T, number>());
+}
+
 export function middleItem<T>(array: T[]): T {
     if (!array.length) {
         throw new Error('Array is empty');
