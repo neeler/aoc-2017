@@ -16,6 +16,7 @@ type FileProcessor<TData> = (
 
 interface PuzzleConfig<TData> {
     day: number;
+    trimInput?: boolean;
     parseInput: FileProcessor<TData>;
     example1?: (data: TData, options: FileProcessorOptions) => any;
     part1: (data: TData, options: FileProcessorOptions) => any;
@@ -30,7 +31,10 @@ export class Puzzle<TData = string> {
     constructor(private readonly config: PuzzleConfig<TData>) {}
 
     private processFile(fileData: string, options: FileProcessorOptions) {
-        return this.config.parseInput(fileData.trim(), options);
+        return this.config.parseInput(
+            this.config.trimInput === false ? fileData : fileData.trim(),
+            options,
+        );
     }
 
     getExampleData({ part }: { part: number }) {
