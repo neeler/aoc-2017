@@ -143,7 +143,7 @@ export class Grid<T> {
         return Grid.from2DStringArray(parseStringBlock(data));
     }
 
-    static stringToNodeGrid<T extends GridNode = GridNode>(
+    static stringToNodeGrid<T extends { toString: () => string }>(
         data: string,
         toNode: (data: { input: string; row: number; col: number }) => T,
     ): Grid<T> {
@@ -315,6 +315,14 @@ export class Grid<T> {
             row: row + dRow * distance,
             col: col + dCol * distance,
         };
+    }
+
+    static turnLeft(direction: Direction) {
+        return CounterClockwiseRotation[direction];
+    }
+
+    static turnRight(direction: Direction) {
+        return ClockwiseRotation[direction];
     }
 
     getNeighborInDirection(row: number, col: number, direction: Direction) {
