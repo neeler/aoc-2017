@@ -46,10 +46,22 @@ export const CounterClockwiseRotation: Record<Direction, Direction> = {
     upRight: 'upLeft',
 };
 
+export interface GridConfig<T> {
+    minX?: number;
+    minY?: number;
+    maxX: number;
+    maxY: number;
+    defaultValue?: (row: number, col: number) => T;
+    blank?: string;
+    drawFn?: (data: T | undefined, row: number, col: number) => string;
+}
+
 export class Grid<T> {
-    private readonly grid: (T | undefined)[][] = [];
-    private readonly minX: number;
-    private readonly minY: number;
+    readonly grid: (T | undefined)[][] = [];
+    readonly minX: number;
+    readonly minY: number;
+    readonly maxX: number;
+    readonly maxY: number;
     readonly width: number;
     readonly height: number;
     private minXUpdated: number | undefined;
@@ -65,15 +77,7 @@ export class Grid<T> {
         defaultValue,
         blank = ' ',
         drawFn,
-    }: {
-        minX?: number;
-        minY?: number;
-        maxX: number;
-        maxY: number;
-        defaultValue?: (row: number, col: number) => T;
-        blank?: string;
-        drawFn?: (data: T | undefined, row: number, col: number) => string;
-    }) {
+    }: GridConfig<T>) {
         this.grid = Array.from({ length: maxY - minY + 1 }, (_, row) =>
             Array.from({ length: maxX - minX + 1 }, (_, col) =>
                 defaultValue?.(row, col),
@@ -82,6 +86,8 @@ export class Grid<T> {
         this.defaultValue = defaultValue;
         this.minX = minX;
         this.minY = minY;
+        this.maxX = maxX;
+        this.maxY = maxY;
         this.width = maxX + 1;
         this.height = maxY + 1;
         this.blank = blank;
