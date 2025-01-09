@@ -1,6 +1,5 @@
 import { Puzzle } from './Puzzle';
 import { getNumbers, splitFilter } from '~/util/parsing';
-import { Queue } from '~/types/Queue';
 import { sum } from '~/util/arithmetic';
 
 class Component {
@@ -15,17 +14,17 @@ class Component {
     }
 }
 
+interface Bridge {
+    usedComponents: Set<Component>;
+    strength: number;
+}
+
 export const puzzle24 = new Puzzle({
     day: 24,
     parseInput: (fileData) => {
-        return splitFilter(fileData).map((line) => new Component(line));
-    },
-    part1: (components) => {
-        const queue = new Queue<{
-            usedComponents: Set<Component>;
-            exposedPort: number;
-            strength: number;
-        }>();
+        const components = splitFilter(fileData).map(
+            (line) => new Component(line),
+        );
         const componentsByPort = new Map<number, Set<Component>>();
         components.forEach((component) => {
             component.ports.forEach((port) => {
@@ -33,73 +32,73 @@ export const puzzle24 = new Puzzle({
                 existing.add(component);
                 componentsByPort.set(port, existing);
             });
-            if (component.ports.includes(0)) {
-                queue.add({
-                    usedComponents: new Set([component]),
-                    exposedPort: component.strength,
-                    strength: component.strength,
-                });
-            }
         });
+        return {
+            components,
+            componentsByPort,
+        };
+    },
+    part1: ({ componentsByPort }) => {
         let maxStrength = 0;
-        queue.process(({ usedComponents, exposedPort, strength }) => {
-            maxStrength = Math.max(maxStrength, strength);
-            for (const component of componentsByPort.get(exposedPort)!) {
-                if (!usedComponents.has(component)) {
-                    const newComponents = new Set(usedComponents);
-                    newComponents.add(component);
-                    queue.add({
-                        usedComponents: newComponents,
-                        exposedPort: component.strength - exposedPort,
-                        strength: strength + component.strength,
-                    });
-                }
-            }
-        });
+        for (const bridge of buildBridges({
+            componentsByPort,
+            usedComponents: new Set(),
+            exposedPort: 0,
+            strength: 0,
+        })) {
+            maxStrength = Math.max(maxStrength, bridge.strength);
+        }
         return maxStrength;
     },
-    part2: (components) => {
-        const queue = new Queue<{
-            usedComponents: Set<Component>;
-            exposedPort: number;
-            strength: number;
-        }>();
-        const componentsByPort = new Map<number, Set<Component>>();
-        components.forEach((component) => {
-            component.ports.forEach((port) => {
-                const existing = componentsByPort.get(port) ?? new Set();
-                existing.add(component);
-                componentsByPort.set(port, existing);
-            });
-            if (component.ports.includes(0)) {
-                queue.add({
-                    usedComponents: new Set([component]),
-                    exposedPort: component.strength,
-                    strength: component.strength,
-                });
-            }
-        });
+    part2: ({ componentsByPort }) => {
         let maxStrengthOfLongest = 0;
         let longestLength = 0;
-        queue.process(({ usedComponents, exposedPort, strength }) => {
-            if (usedComponents.size > longestLength) {
-                longestLength = usedComponents.size;
-                maxStrengthOfLongest = strength;
-            } else if (usedComponents.size === longestLength) {
-                maxStrengthOfLongest = Math.max(maxStrengthOfLongest, strength);
+        for (const bridge of buildBridges({
+            componentsByPort,
+            usedComponents: new Set(),
+            exposedPort: 0,
+            strength: 0,
+        })) {
+            if (bridge.usedComponents.size > longestLength) {
+                longestLength = bridge.usedComponents.size;
+                maxStrengthOfLongest = bridge.strength;
+            } else if (bridge.usedComponents.size === longestLength) {
+                maxStrengthOfLongest = Math.max(
+                    maxStrengthOfLongest,
+                    bridge.strength,
+                );
             }
-            for (const component of componentsByPort.get(exposedPort)!) {
-                if (!usedComponents.has(component)) {
-                    const newComponents = new Set(usedComponents);
-                    newComponents.add(component);
-                    queue.add({
-                        usedComponents: newComponents,
-                        exposedPort: component.strength - exposedPort,
-                        strength: strength + component.strength,
-                    });
-                }
-            }
-        });
+        }
         return maxStrengthOfLongest;
     },
 });
+
+function* buildBridges({
+    componentsByPort,
+    usedComponents,
+    exposedPort,
+    strength,
+}: {
+    componentsByPort: Map<number, Set<Component>>;
+    usedComponents: Set<Component>;
+    exposedPort: number;
+    strength: number;
+}): Generator<Bridge> {
+    for (const component of componentsByPort.get(exposedPort)!) {
+        if (!usedComponents.has(component)) {
+            const newComponents = new Set(usedComponents);
+            newComponents.add(component);
+            yield* buildBridges({
+                componentsByPort,
+                usedComponents: newComponents,
+                exposedPort: component.strength - exposedPort,
+                strength: strength + component.strength,
+            });
+        }
+    }
+
+    yield {
+        usedComponents,
+        strength,
+    };
+}
