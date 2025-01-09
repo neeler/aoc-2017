@@ -14,7 +14,8 @@
     "start": "node ./dist/src/index.js",
     "postinstall": "npm run setup",
     "lint:es": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "type-check": "npx tsc --noEmit"
   },
   "author": "neeler",
   "license": "ISC",
